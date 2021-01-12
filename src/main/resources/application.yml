@@ -1,0 +1,36 @@
+spring:
+  # datasource:
+  #   url: jdbc:postgresql://dalmuti-db.cy62je3vyh4c.ap-northeast-2.rds.amazonaws.com:5424/nddmt
+  #   username: postgres
+  #   password: fintech204
+  #   hikari:
+  #     maximum-pool-size: 4
+
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+
+  jpa:
+    # database: POSTGRESQL
+    # database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    open-in-view: false
+    show-sql: false
+    hibernate:
+      format_sql: true
+      ddl-auto: update
+
+server:
+  port: 38081
+
+logging:
+  pattern:
+    rolling-file-name: "${LOG_FILE}.%d{yyyyMMdd}.%i"
+    console: "[%d] [%p] [%F:%M:%L] %msg%n"
+    file: "[%d] [%p] [%F:%M:%L] %msg%n"
+  file:
+    name: /kbklog/dalmuti/app.log
+    max-size: 100MB
+    max-history: 365
+  level:
+    kbank: debug
+    root: info
