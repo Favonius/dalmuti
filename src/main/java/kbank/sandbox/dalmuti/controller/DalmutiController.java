@@ -1,6 +1,8 @@
 package kbank.sandbox.dalmuti.controller;
 
 import kbank.sandbox.dalmuti.game.business.GameManager;
+import kbank.sandbox.dalmuti.message.business.MessageManager;
+import kbank.sandbox.dalmuti.message.dto.MessageForm;
 import kbank.sandbox.dalmuti.user.business.UserManager;
 import kbank.sandbox.dalmuti.game.dto.GamerForm;
 import kbank.sandbox.dalmuti.game.dto.GameForm;
@@ -40,6 +42,8 @@ public class DalmutiController {
     private final UserManager userManager;
 
     private final GameManager gameManager;
+
+    private final MessageManager messageManager;
 
     /**
      * 로그인 처리를 수행한다.
@@ -84,25 +88,6 @@ public class DalmutiController {
         jsonObject.put("result", result);
         jsonObject.put("resultCode", "000");
         jsonObject.put("message", "게임을 생성하였습니다.");
-
-        return jsonObject;
-    }
-
-    /**
-     * 대기실에 입장한 인원으로 게임을 시작한다.
-     *
-     * @param : game ID 및 gamer 대상 user list
-     * @return : 결과코드, 메시지
-     */
-    @PostMapping("/startgame")
-    public JSONObject startGame(@RequestBody @Valid InGameForm inGameForm) {
-        logger.error("request form: {}", inGameForm.toString());
-
-        gameManager.startGame(inGameForm);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("resultCode", "000");
-        jsonObject.put("message", "게임이 시작되었습니다.");
 
         return jsonObject;
     }
@@ -384,6 +369,27 @@ public class DalmutiController {
 
         return jsonObject;
     }
-    
 
+    /**
+     * 텔레그램을 전송한다.
+     *
+     * @param : userForm 사용자 정보
+     * @return : 결과코드, 메시지
+     */
+    @PostMapping("/sendtelegram")
+    public JSONObject sendTelegram(@RequestBody @Valid MessageForm messageForm) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("request form: {}", messageForm.toString());
+        }
+
+        messageManager.sendMessage(messageForm);
+
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("resultCode", "000");
+        jsonObject.put("message", "텔레그램 전송되었습니다.");
+
+        return jsonObject;
+    }
+    
 }

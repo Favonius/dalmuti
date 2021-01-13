@@ -35,7 +35,10 @@ public class MessageForm {
     @Max(1)
     private int messageCode;
 
-    @Size(max=50, message="메시지는 50자리를 초과할 수 없습니다.")
+    @Size(max=100, message="메시지는 100자리를 초과할 수 없습니다.")
     private String message;
+
+    @Size(max=20, message="채팅 ID는 20자리를 초과할 수 없습니다.")
+    private String chatId;
 
 }

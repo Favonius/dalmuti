@@ -69,64 +69,6 @@ public class GameManager {
     }
 
     /**
-     * 게임을 시작한다.
-     *
-     * @param : gamerForm 게임 참가자 정보
-     * @return :
-     * 1. 게임 상태 변경(게임준비 -> 카드확인)
-     * 1.1. 게임 상태코드 정상여부 확인(전달된 상태와 저장된 상태값이 다른 경우, 게임상태가 유효하지 않음)
-     * 1.2. 게임 상태코드 수정(현재상태 + 1 / 총 상태수)
-     * 2. 사용자 검증 및 게임 참가자 등록
-     * 2.1. 사용자 검증
-     * 2.2. 게임 참가자 등록
-     * 3. 등록된 게임 참가자 인원 검증(view 에서 전달된 인원 중복 점검 단계)
-     */
-    @Transactional
-    public void startGame(InGameForm inGameForm) {
-        logger.error("startGame info: {}", inGameForm.toString());
-
-//        // 1. 게임 상태 변경(대기실 -> 게임준비)
-//        //GameForm gameFormOut = updateGameCode(gameForm);
-//        GamerForm gamerForm = new GamerForm();
-//
-//        // 2. 사용자 검증 및 게임 참가자 등록
-//        final HashSet<String> gamerIds = new HashSet<>();
-//
-//        // 1. 게이머 랭크 조회()
-//        List<GamerForm> gamerFormList = gamerService.selectGamerList(gamerForm);
-
-        logger.error("처리전");
-
-//        for(int i = 0; i< gamerFormList.size(); i++) {
-//
-//            logger.error("User info: {}", UserForm.convert(gamerFormList.get(i).getUser()).toString());
-//
-//            // 2.1. 사용자 검증
-//            UserForm userForm = userManager.getUser(UserForm.convert(gamerFormList.get(i).getUser()));
-//
-//            // 2.2. 랭크변경
-//            gamerFormList.get(i).setRank(i + 1);
-//
-//            logger.error("updateGamer Before");
-//
-//            logger.error("Gamer info: {}", gamerFormList.get(i));
-//
-//            gamerService.updateGamer(gamerFormList.get(i));
-//            logger.error("updateGamer After");
-//
-//            gamerIds.add(gamerFormList.get(i).getGamerId());
-//
-//        }
-
-        logger.error("updateGamer End");
-
-        // 3. 등록된 게임 참가자 인원 검증(view 에서 전달된 인원 중복 점검 단계)
-//        if(gamerIds.size() < 1 || gamerIds.size() > 8) {
-//            throw new IllegalGamerCountException();
-//        }
-    }
-
-    /**
      * 선을 정하기 위해 카드를 선택한다.
      *
      * @param : inGameForm 게임 참가자 및 카드정보
