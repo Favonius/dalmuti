@@ -27,7 +27,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class GamerForm {
+public class GamerForm  implements Comparable<GamerForm> {
 
     @Size(max=10, message="게임 참가자 ID는 10자리를 초과할 수 없습니다.")
     private String gamerId;
@@ -101,5 +101,16 @@ public class GamerForm {
         }
 
         return gamerFormList;
+    }
+
+    @Override
+    public int compareTo(GamerForm gamerForm) {
+        if(this.rank > gamerForm.rank) {
+            return 1;
+        } else if(this.rank < gamerForm.rank) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }

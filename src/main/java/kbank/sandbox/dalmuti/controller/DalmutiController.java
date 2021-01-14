@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import kbank.sandbox.dalmuti.game.exception.*;
 
 import java.util.List;
 
@@ -283,6 +284,47 @@ public class DalmutiController {
     }
 
     /**
+     * 게임 참여 가능 검증
+     *
+     * @param : engageGameForm
+     * @return : 결과코드, 메시지
+     */
+    @PostMapping("/validengagegame")
+    public JSONObject validEngageGame(@RequestBody @Valid InGameForm inGameForm) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("request form: {}", inGameForm);
+        }
+
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            GamerForm result = gameManager.validEngageGame(inGameForm);
+
+            jsonObject.put("result", result);
+            jsonObject.put("resultCode", "000");
+            jsonObject.put("message", "게임에 참여했습니다.");
+    
+            return jsonObject;
+    
+        } catch (IllegalGameAlreadyStartException e){
+            jsonObject.put("result", null);
+            jsonObject.put("resultCode", "001");
+            jsonObject.put("message", "이미 시작된 게임은 참가할 수 없습니다.");
+    
+            return jsonObject;
+
+        } catch (IllegalGamerCountException e) {
+            jsonObject.put("result", null);
+            jsonObject.put("resultCode", "002");
+            jsonObject.put("message", "게임 가능인원 8명을 초과했습니다. ");
+    
+            return jsonObject;
+        }
+    }
+    
+
+
+    /**
      * 게임 참여
      *
      * @param : engageGameForm
@@ -294,14 +336,32 @@ public class DalmutiController {
             logger.debug("request form: {}", inGameForm);
         }
 
-        GamerForm result = gameManager.engageGame(inGameForm);
-
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", result);
-        jsonObject.put("resultCode", "000");
-        jsonObject.put("message", "게임에 참여했습니다.");
 
-        return jsonObject;
+        try {
+            GamerForm result = gameManager.engageGame(inGameForm);
+
+            jsonObject.put("result", result);
+            jsonObject.put("resultCode", "000");
+            jsonObject.put("message", "게임에 참여했습니다.");
+    
+            return jsonObject;
+    
+        } catch (IllegalGameAlreadyStartException e){
+            jsonObject.put("result", null);
+            jsonObject.put("resultCode", "001");
+            jsonObject.put("message", "이미 시작된 게임은 참가할 수 없습니다.");
+    
+            return jsonObject;
+
+        } catch (IllegalGamerCountException e) {
+            jsonObject.put("result", null);
+            jsonObject.put("resultCode", "002");
+            jsonObject.put("message", "게임 가능인원 8명을 초과했습니다. ");
+    
+            return jsonObject;
+        }
+
     }
 
     /**

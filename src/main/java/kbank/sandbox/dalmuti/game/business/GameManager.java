@@ -292,6 +292,8 @@ public class GameManager {
      * 2.2.1. 게임 참가자 순서 역순 정비(노예가 왕으로, 왕이 노예로)
      * 2.2.2. 게임 참가자 순서 변경(노예가 왕으로, 왕이 노예로)
      * 2.3. 게임 참가자 상태값 변경(카드대기, 세금징수 -> 게임진행)
+     * 2.3.1. 게임참가자 순서에 따른 선 설정(1등)
+     * 2.3.2. 게임 최종 제출자 기본 설정
      * 2.4. 게임 상태값 변경(카드확인 -> 세금징수 -> 게임진행)
      * 2.4.1. 게임 상태값 변경(카드확인 -> 세금징수)
      * 2.4.2. 게임 상태값 변경(세금징수 -> 게임진행)
@@ -329,6 +331,16 @@ public class GameManager {
             gamerRankForm.setRank(++rank);
             // 2.3. 게임 참가자 상태값 변경(카드대기, 세금징수 -> 게임진행)
             gamerRankForm.setStatus(GamerStatusEnum.PLAY.ordinal());
+            // 2.3.1. 게임참가자 순서에 따른 선 설정(1등)
+            if(rank == 1) {
+                gamerRankForm.setTurn(true);
+                // 2.3.2. 게임 최종 제출자 기본 설정
+                GameForm gameForm = gameService.selectGame(GameForm.convert(gamerRankForm.getGame()));
+                gameForm.setLastUser(gamerRankForm.getUser());
+                gameService.updateGame(gameForm);
+            } else {
+                gamerRankForm.setTurn(false);
+            }
             gamerService.updateGamer(gamerRankForm);
         }
 
@@ -899,6 +911,48 @@ public class GameManager {
     }
 
     /**
+     * 게임참여 validation
+     *
+     * @param : EngageGamerForm 게임 정보
+     * @return :
+     * 1. 대기실 게이머 생성
+     */
+    @Transactional
+    public GamerForm validEngageGame(InGameForm inGameForm) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("validEngageGame info: {}", inGameForm.toString());
+        }
+        GamerForm gamerForm = new GamerForm();
+        GameForm gameForm = gameService.selectGame(GameForm.convert(inGameForm.getGameId()));
+
+        //이미 게이머로 참여하고 있는 사람은 통과
+        gamerForm.setGame(Game.createGame(gameForm));
+
+        // 1. 게이머 조회()
+        List<GamerForm> gamerFormList = gamerService.selectGamerList(gamerForm);
+
+        // 2. 게이머 체크(기존에 userName이 같으면 return)
+        for(int i = 0; i < gamerFormList.size(); i++) {
+            if(inGameForm.getUserName().equals(gamerFormList.get(i).getUser().getUserName())) {
+                return gamerFormList.get(i);
+            }
+        }
+
+        //참여하면 게이머가 8명 초과임
+        if(gamerFormList.size() >= 8) {
+            throw new IllegalGamerCountException();
+        }
+
+        //게임이 이미 시작됨
+        if(GameCodeEnum.WAIT.ordinal() != gameForm.getGameCode()) {
+            throw new IllegalGameAlreadyStartException();
+        }
+
+        return new GamerForm();
+    }
+
+
+    /**
      * 대기실 게임참여 게이머생성
      *
      * @param : EngageGamerForm 게임 정보
@@ -913,6 +967,13 @@ public class GameManager {
 
         GamerForm gamerForm = new GamerForm();
         GameForm gameForm = gameService.selectGame(GameForm.convert(inGameForm.getGameId()));
+
+        //게임이 이미 시작됨
+        if(GameCodeEnum.WAIT.ordinal() != gameForm.getGameCode()) {
+            throw new IllegalGameAlreadyStartException();
+        }
+
+        
         
         gamerForm.setGame(Game.createGame(gameForm));
         gamerForm.setUser(User.createUser(userManager.getUser(UserForm.convert(inGameForm.getUserId()))));
@@ -920,10 +981,14 @@ public class GameManager {
         // 1. 게이머 랭크 조회()
         List<GamerForm> gamerFormList = gamerService.selectGamerList(gamerForm);
 
-        // 2. 게이머 체크(기존에 userName이 같으면 retrun)
+        //참여하면 게이머가 8명 초과임
+        if(gamerFormList.size() >= 8) {
+            throw new IllegalGamerCountException();
+        }
 
+        // 2. 게이머 체크(기존에 userName이 같으면 retrun)
         for(int i = 0; i < gamerFormList.size(); i++) {
-            if(gamerForm.getUser().getUserId().equals(gamerFormList.get(i).getUser().getUserId())) {
+            if(inGameForm.getUserId().equals(gamerFormList.get(i).getUser().getUserId())) {
                 return gamerService.selectGamer(gamerFormList.get(i));
             }
         }

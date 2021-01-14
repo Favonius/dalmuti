@@ -40,8 +40,14 @@ public class UserManager {
             logger.debug("login user info: {}", userForm.toString());
         }
 
-        // 1. 사용자 등록
-        return userService.createUser(userForm);
+        UserForm userNameForm = userService.selectUserByUserName(userForm);
+
+        if(userNameForm != null) {
+            return userNameForm;
+        } else {
+            // 1. 사용자 등록
+            return userService.createUser(userForm);
+        }
     }
 
     /**

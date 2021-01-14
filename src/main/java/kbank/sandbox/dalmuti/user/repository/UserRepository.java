@@ -2,6 +2,7 @@ package kbank.sandbox.dalmuti.user.repository;
 
 import kbank.sandbox.dalmuti.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -22,4 +23,12 @@ public interface UserRepository extends JpaRepository<User, String> {
      * @return : boolean 기등록여부 True/False
      */
     boolean existsByUserId(String userId);
+
+    /**
+     * 사용자 Name 조회
+     *
+     * @param : userName 사용자 Name
+     * @return : User Name 기준 대상 사용자
+     */
+    Optional<User> findByUserName(String userName);
 }

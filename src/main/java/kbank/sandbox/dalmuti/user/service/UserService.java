@@ -3,6 +3,7 @@ package kbank.sandbox.dalmuti.user.service;
 import kbank.sandbox.dalmuti.user.domain.User;
 import kbank.sandbox.dalmuti.user.dto.UserForm;
 import kbank.sandbox.dalmuti.user.exception.IllegalUserIdException;
+import kbank.sandbox.dalmuti.user.exception.IllegalUserNameException;
 import kbank.sandbox.dalmuti.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -70,6 +71,26 @@ public class UserService {
     public UserForm selectUser(UserForm userForm) {
         // 1. 사용자 기 등록여부 점검(미 등록시 Exception) 및 조회
         return UserForm.convert(userRepository.findById(userForm.getUserId()).orElseThrow(IllegalUserIdException::new));
+    }
+
+    /**
+     * 정상 사용자 여부를 검증한다.
+     *
+     * @param : userForm 사용자 정보
+     * @return : UserForm 사용자 정보
+     * 1. 사용자 기 등록여부 점검 및 조회
+     */
+    @Transactional
+    public UserForm selectUserByUserName(UserForm userForm) {
+        // 1. 사용자 기 등록여부 점검 및 조회
+        // 1. 사용자 기 등록여부 점검 및 조회
+        UserForm userNameForm;
+        try {
+            userNameForm = UserForm.convert(userRepository.findByUserName(userForm.getUserName()).orElseThrow(IllegalUserNameException::new));
+        } catch(IllegalUserNameException e) {
+            userNameForm = null;
+        }
+        return userNameForm;
     }
 
     /**

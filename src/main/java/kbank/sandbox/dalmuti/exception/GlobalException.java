@@ -80,4 +80,9 @@ public class GlobalException {
     public JSONObject illegalGamerLastUserException(){
         return ErrorResponse.JsonErrorResponse(400, "플레이어는 선입니다.");
     }
+
+    @ExceptionHandler(IllegalGameAlreadyStartException.class)
+    public JSONObject IllegalGameAlreadyStartException(){
+        return ErrorResponse.JsonErrorResponse(400, "혁명이 실패하였습니다.");
+    }
 }
