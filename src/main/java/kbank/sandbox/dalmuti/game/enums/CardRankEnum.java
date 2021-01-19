@@ -12,7 +12,7 @@ package kbank.sandbox.dalmuti.game.enums;
  */
 public enum CardRankEnum {
     NONE,           // 0:미사용
-    DALMUTI,        // 1:카드대기
+    DALMUTI,        // 1:왕(달무티)
     ARCHBISHOP,     // 2:대주교
     EARL_MARSHAL,   // 3:시종장
     BARONESS,       // 4:남작부인

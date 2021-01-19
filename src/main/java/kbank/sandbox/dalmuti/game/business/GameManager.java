@@ -606,6 +606,7 @@ public class GameManager {
      * 5.1. 게임 상태값 변경(게임진행 -> 게임종료)
      * 5.2. 잔여 게임 참가자 상태 변경(게임진행 -> 게임종료)
      * 5.3. 잔여 카드 삭제
+     * 5.4. 전체 게이머 Rank 변경(Next Rank -> Rank)
      */
     @Transactional
     public void drawCard(InGameForm inGameForm) {
@@ -720,6 +721,17 @@ public class GameManager {
                 for(DeckForm lastDeckForm:lastDeckFormList) {
                     deckService.deleteDeck(lastDeckForm);
                 }
+                // 5.4. 전체 게이머 Rank 변경(Next Rank -> Rank)
+                gamerForm.setRank(gamerForm.getNxtRank()!=0?gamerForm.getNxtRank():gamerForm.getRank());
+                gamerForm.setNxtRank(0);
+                gamerFormList =  gamerService.selectGamerList(gamerForm);
+                for(GamerForm gamerRankForm:gamerFormList) {
+                    if(!gamerForm.getGamerId().equals(gamerRankForm.getGamerId())) {
+                        gamerRankForm.setRank(gamerRankForm.getNxtRank()!=0?gamerRankForm.getNxtRank():gamerRankForm.getRank());
+                        gamerRankForm.setNxtRank(0);
+                        gamerService.updateGamer(gamerRankForm);
+                    }
+                }
             }
         }
 
@@ -751,8 +763,6 @@ public class GameManager {
         gamerForm.setJokerCnt(0);
         gamerForm.setRevolution(false);
         gamerForm.setTurn(false);
-        gamerForm.setRank(gamerForm.getNxtRank());
-        gamerForm.setNxtRank(0);
         gamerForm.setStatus(GamerStatusEnum.WAIT.ordinal());
         gamerService.updateGamer(gamerForm);
 
