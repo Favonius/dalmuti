@@ -144,8 +144,11 @@ public class GameManager {
         GamerForm inGamerForm = gamerService.selectGamer(GamerForm.convert(inGameForm.getGamerId()));
         List<GamerForm> gamerFormList =  gamerService.selectGamerList(inGamerForm);
 
+        if(inGamerForm.getGame().getGameCode() != GameCodeEnum.READY.ordinal()) {
+            throw new IllegalGamerStatusException();
+        }
         // 2.1. 카드분배 권한 확인(순위가 1순위인 참가자만 가능)
-        // if(!gamerFormList.isEmpty() && !inGameForm.getGamer().getGamerId().equals(gamerFormList.get(0).getGamerId())) {
+        // if(inGamerForm.getRank() != 1 || inGamerForm.getStatus() != GamerStatusEnum.WAIT.ordinal()) {
         //     throw new IllegalGamerRankException();
         // }
 
@@ -262,6 +265,10 @@ public class GameManager {
         // 1. 게임 참가자 기 등록여부 점검(미 등록시 Exception) 및 조회
         GamerForm gamerForm = gamerService.selectGamer(GamerForm.convert(inGameForm.getGamerId()));
 
+        if(gamerForm.getStatus() != GamerStatusEnum.WAIT.ordinal()) {
+            throw new IllegalGamerStatusException();
+        }
+
         // 2. 게임 참가자 상태값 변경(카드대기 -> 카드확인)
         updateGamerStatus(gamerForm);
 
@@ -307,7 +314,7 @@ public class GameManager {
         // 1. 게임 참가자 기 등록여부 점검(미 등록시 Exception) 및 조회
         GamerForm gamerForm = gamerService.selectGamer(GamerForm.convert(inGameForm.getGamerId()));
 
-        if(gamerForm.getJokerCnt() < 2) {
+        if(gamerForm.getJokerCnt() < 2 || gamerForm.getStatus() != GamerStatusEnum.WAIT.ordinal()) {
             throw new IllegalGamerRevolutionException();
         }
 
@@ -385,7 +392,7 @@ public class GameManager {
         }
 
         // 1.1. 게임 참가자 세금수납 가능여부 확인(1, 2 rank 만 세금수납 가능)
-        if(gamerForm.getRank() > 2 || gamerForm.getRank() < 1) {
+        if(gamerForm.getRank() > 2 || gamerForm.getRank() < 1 || gamerForm.getStatus() != GamerStatusEnum.TAX.ordinal()) {
             throw new IllegalGamerTaxException();
         }
 
@@ -501,8 +508,9 @@ public class GameManager {
         if (logger.isDebugEnabled()) {
             logger.debug("taxCard gamerForm info: {}", gamerForm.toString());
         }
+
         // 1.1. 게임 참가자 세금수납 가능여부 확인(1, 2 rank 만 세금수납 가능)
-        if(gamerForm.getRank() > 2 || gamerForm.getRank() < 1) {
+        if(gamerForm.getRank() > 2 || gamerForm.getRank() < 1 || gamerForm.getStatus() != GamerStatusEnum.TAX.ordinal()) {
             throw new IllegalGamerTaxException();
         }
 
@@ -901,7 +909,7 @@ public class GameManager {
     private GamerForm updateGamerStatus(GamerForm gamerFormInput) {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("taxCard updateGamerStatus info: {}", gamerFormInput.toString());
+            logger.debug("updateGamerStatus info: {}", gamerFormInput.toString());
         }
 
         // 1. 게임 참가자 기 등록여부 점검(미 등록시 Exception) 및 조회
@@ -1055,6 +1063,10 @@ public class GameManager {
         GamerForm gamerForm = gamerService.selectGamer(GamerForm.convert(inGameForm.getGamerId()));
 
         GameForm gameForm = gameService.selectGame(GameForm.convert(gamerForm.getGame()));
+
+        if(gameForm.getGameCode() != GameCodeEnum.WAIT.ordinal()) {
+            throw new IllegalGameCodeException();
+        }
 
         gameForm.setGameCode(GameCodeEnum.READY.ordinal());
 
